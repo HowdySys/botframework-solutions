@@ -1,4 +1,7 @@
-﻿namespace PointOfInterestSkill.Utilities
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
+namespace PointOfInterestSkill.Utilities
 {
     public class Actions
     {
