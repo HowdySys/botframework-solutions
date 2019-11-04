@@ -7,6 +7,6 @@ namespace ITSMSkill.Services
 {
     public interface IServiceManager
     {
-        IITServiceManagement CreateManagement(BotSettings botSettings, TokenResponse tokenResponse);
+        IITServiceManagement CreateManagement(BotSettings botSettings, TokenResponse tokenResponse, ref object serviceCache);
     }
 }

@@ -7,11 +7,11 @@ namespace ITSMSkill.Services
 {
     public class ServiceManager : IServiceManager
     {
-        public IITServiceManagement CreateManagement(BotSettings botSettings, TokenResponse tokenResponse)
+        public IITServiceManagement CreateManagement(BotSettings botSettings, TokenResponse tokenResponse, ref object serviceCache)
         {
             if (tokenResponse.ConnectionName == "ServiceNow" && !string.IsNullOrEmpty(botSettings.ServiceNowUrl) && !string.IsNullOrEmpty(botSettings.ServiceNowGetUserId))
             {
-                return new ServiceNow.Management(botSettings.ServiceNowUrl, tokenResponse.Token, botSettings.LimitSize, botSettings.ServiceNowGetUserId);
+                return new ServiceNow.Management(botSettings.ServiceNowUrl, tokenResponse.Token, botSettings.LimitSize, botSettings.ServiceNowGetUserId, ref serviceCache);
             }
             else
             {

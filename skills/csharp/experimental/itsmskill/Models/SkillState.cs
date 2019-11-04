@@ -15,6 +15,9 @@ namespace ITSMSkill.Models
             ClearLuisResult();
         }
 
+        // used by Service to cache internal states
+        public object ServiceCache { get; set; }
+
         // handle manually
         public int PageIndex { get; set; }
 

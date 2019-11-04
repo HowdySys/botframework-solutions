@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using ITSMSkill.Models;
 using ITSMSkill.Models.ServiceNow;
 using ITSMSkill.Responses.Shared;
+using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Serializers;
@@ -32,6 +33,7 @@ namespace ITSMSkill.Services.ServiceNow
         private readonly string token;
         private readonly int limitSize;
         private readonly string knowledgeUrl;
+        private readonly string userId;
 
         static Management()
         {
@@ -56,13 +58,44 @@ namespace ITSMSkill.Services.ServiceNow
             StringToTicketState = new Dictionary<string, TicketState>(TicketStateToString.Select(pair => KeyValuePair.Create(pair.Value, pair.Key)));
         }
 
-        public Management(string url, string token, int limitSize, string getUserIdResource)
+        public Management(string url, string token, int limitSize, string getUserIdResource, ref object serviceCache)
         {
             this.client = new RestClient($"{url}/api/");
             this.getUserIdResource = getUserIdResource;
             this.token = token;
             this.limitSize = limitSize;
             this.knowledgeUrl = $"{url}/kb_view.do?sysparm_article={{0}}";
+
+            bool validUserId = false;
+
+            var hasher = new PasswordHasher<Management>();
+            if (serviceCache is Cache cache && !string.IsNullOrEmpty(cache.UserSysId) && !string.IsNullOrEmpty(cache.TokenHash))
+            {
+                var result = hasher.VerifyHashedPassword(null, cache.TokenHash, token);
+                if (result == PasswordVerificationResult.Success)
+                {
+                    validUserId = true;
+                }
+                else if (result == PasswordVerificationResult.SuccessRehashNeeded)
+                {
+                    validUserId = true;
+                    cache.TokenHash = hasher.HashPassword(null, token);
+                }
+            }
+
+            if (validUserId)
+            {
+                userId = (serviceCache as Cache).UserSysId;
+            }
+            else
+            {
+                userId = GetUserId().Result;
+                serviceCache = new Cache
+                {
+                    UserSysId = userId,
+                    TokenHash = hasher.HashPassword(null, token)
+                };
+            }
         }
 
         public async Task<TicketsResult> CreateTicket(string title, string description, UrgencyLevel urgency)
@@ -72,7 +105,7 @@ namespace ITSMSkill.Services.ServiceNow
                 var request = CreateRequest(TicketResource);
                 var body = new CreateTicketRequest()
                 {
-                    caller_id = await GetUserId(),
+                    caller_id = userId,
                     short_description = title,
                     description = description,
                     urgency = UrgencyToString[urgency]
@@ -197,7 +230,7 @@ namespace ITSMSkill.Services.ServiceNow
                 {
                     close_code = "Closed/Resolved by Caller",
                     state = "7",
-                    caller_id = await GetUserId(),
+                    caller_id = userId,
                     close_notes = reason
                 };
                 request.JsonSerializer = new JsonNoNull();
@@ -285,7 +318,7 @@ namespace ITSMSkill.Services.ServiceNow
         {
             var sysparmQuery = new List<string>
             {
-                $"caller_id={await GetUserId()}"
+                $"caller_id={userId}"
             };
 
             if (!string.IsNullOrEmpty(query))

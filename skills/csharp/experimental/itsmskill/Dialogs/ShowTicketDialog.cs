@@ -181,7 +181,9 @@ namespace ITSMSkill.Dialogs
                 state.PageIndex = 0;
             }
 
-            var management = ServiceManager.CreateManagement(Settings, sc.Result as TokenResponse);
+            var serviceCache = state.ServiceCache;
+            var management = ServiceManager.CreateManagement(Settings, sc.Result as TokenResponse, ref serviceCache);
+            state.ServiceCache = serviceCache;
 
             var urgencies = new List<UrgencyLevel>();
             if (state.UrgencyLevel != UrgencyLevel.None)
