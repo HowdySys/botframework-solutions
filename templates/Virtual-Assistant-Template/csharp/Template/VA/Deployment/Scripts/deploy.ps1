@@ -92,7 +92,7 @@ if (-not $appId) {
 	if(-not $appId) {
 		Write-Host "! Could not provision Microsoft App Registration automatically. Review the log for more information." -ForegroundColor DarkRed
 		Write-Host "! Log: $($logFile)" -ForegroundColor DarkRed
-		Write-Host "+ Provision an app manually in the Azure Portal, then try again providing the -appId and -appPassword arguments. See https://aka.ms/vamanualappcreation for more information." -ForegroundColor Magenta
+		Write-Host "+ Provision an app manually in the Azure Portal, then try again providing the -appId and -appPassword arguments. See https://microsoft.github.io/botframework-solutions/help/known-issues/ for more information." -ForegroundColor Magenta
 		Break
 	}
 }
