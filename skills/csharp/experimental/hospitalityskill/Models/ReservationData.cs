@@ -1,4 +1,5 @@
-﻿using Microsoft.Bot.Builder.Solutions.Responses;
+﻿using System;
+using Microsoft.Bot.Builder.Solutions.Responses;
 
 namespace HospitalitySkill.Models
 {
@@ -10,7 +11,9 @@ namespace HospitalitySkill.Models
 
         public string CheckOutDate { get; set; }
 
-        public string CheckOutTime { get; set; }
+        public string CheckOutTime { get { return CheckOutTimeData.ToString(@"hh\:mm"); } }
+
+        public TimeSpan CheckOutTimeData { get; set; }
 
         public ReservationData Copy()
         {

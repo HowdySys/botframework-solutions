@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using HospitalitySkill.Models;
 using static Luis.HospitalityLuis._Entities;
@@ -15,7 +16,7 @@ namespace HospitalitySkill.Services
         void UpdateReservationDetails(ReservationData reservation);
 
         // check late check out availability
-        Task<string> GetLateCheckOutAsync();
+        Task<TimeSpan> GetLateCheckOutAsync();
 
         // request items to be brought
         Task<bool> RequestItems(List<ItemRequestClass> items);
